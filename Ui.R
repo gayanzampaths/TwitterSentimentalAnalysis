@@ -7,14 +7,33 @@ ui <- fluidPage( theme = "bootstrap.css", #Use bootstrap css
                      tabPanel("Analysis", #Analysis Tab
                         
                         #Designing sidebar components
-                        sidebarPanel(helpText("When you enter related KEYWORDS, we can search Tweets through Twitter.")),
+                        sidebarPanel(helpText("When you enter related KEYWORDS, we can search Tweets through Twitter."),
+                                     textInput("searchTerm", "Enter Keyword to Search Tweets", ""), #text input for get keywords
+                                     HTML("<hr>"),
+                                     helpText("How many number of Tweets you want to extract? Select between 5 - 1000"),
+                                     sliderInput("maxTweets","Number of recent tweets to use for analysis:",min=5,max=1000,value=500), #slider for select tweet count 
+                                     submitButton(text="Analyse"), #submit keyword and tweet count to the server
+                                     HTML("<hr>"),
+                                     helpText("Enter keywords to Search Tweets using #tags. ('Follow #')"),
+                                     textInput("searchTerm", "Enter tag Keyword to Search Tweets", "#"), #text input for get #tags 
+                                     submitButton(text="tagsAnalyse") #submit keyword and tweet count to the server 
+                                     ), 
                         
                         #Designing mainPanel Components
-                        mainPanel(textInput("searchTerm", "Enter data to be searched with '#'", "#"))),
+                        mainPanel(tabsetPanel(
+                          tabPanel("Results",
+                                   HTML("<div class = text-center><h2>Sentiment Analysis Results</h2></div>"),
+                                   HTML("<div><h4>Analyzed Tweets in a tablular form on a scale of 5</h4></div>"),
+                                   tableOutput("tabledata")),
+                          
+                          tabPanel("Overall Analysis",
+                                   HTML("<div class = text-center><h2>Pie Chart</h3></div>"), 
+                                   plotOutput("piechart"),
+                                   HTML("<div class = text-center><h2>Histogram</h3></div>"),
+                                   plotOutput("histPos"))))),
                      
                      tabPanel(title =  "About Project", #Tab For About This Project
-                              HTML("<div class = text-center>
-                                   <h1 class=text-primary>Twitter Sentiment Analysis</h1>
-                                   </div>"))
+                              HTML("<div class = text-center><h1 class=text-primary>Twitter Sentiment Analysis</h1></div>"),
+                              HTML("<div><p>This project is Develop Under Cloude Computing Group Project.Tweets Directly filter from Twitter API by using user's keywords or #tag keywords. Then Clean Tweets for remove unwonted text effects and formats. Then analyze positivity or negativity of Tweets through the lexical analyzer</p></div>"))
   ))
 )

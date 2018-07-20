@@ -12,25 +12,16 @@ ui <- fluidPage( theme = "bootstrap.css", #Use bootstrap css
                                      HTML("<hr>"),
                                      helpText("How many number of Tweets you want to extract? Select between 5 - 1000"),
                                      sliderInput("maxTweets","Number of recent tweets to use for analysis:",min=5,max=1000,value=500), #slider for select tweet count 
-                                     submitButton(text="Analyse"), #submit keyword and tweet count to the server
-                                     HTML("<hr>"),
-                                     helpText("Enter keywords to Search Tweets using #tags. ('Follow #')"),
-                                     textInput("searchTerm", "Enter tag Keyword to Search Tweets", "#"), #text input for get #tags 
-                                     submitButton(text="tagsAnalyse") #submit keyword and tweet count to the server 
+                                     submitButton(text="Analyse") #submit keyword and tweet count to the server
                                      ), 
                         
                         #Designing mainPanel Components
                         mainPanel(tabsetPanel(
                           tabPanel("Results",
-                                   HTML("<div class = text-center><h2>Sentiment Analysis Results</h2></div>"),
-                                   HTML("<div><h4>Analyzed Tweets in a tablular form on a scale of 5</h4></div>"),
-                                   tableOutput("tabledata")),
-                          
-                          tabPanel("Overall Analysis",
-                                   HTML("<div class = text-center><h2>Pie Chart</h3></div>"), 
-                                   plotOutput("piechart"),
-                                   HTML("<div class = text-center><h2>Histogram</h3></div>"),
-                                   plotOutput("histPos"))))),
+                                   HTML("<div class = text-center><h2>Bar-Chart</h3></div>"), 
+                                   plotOutput("histPos")),
+                          tabPanel("WordCloud",HTML("<div><h3>Most used words associated with the Keyword that you search!</h3></div>"),plotOutput("word"))
+                          ))),
                      
                      tabPanel(title =  "About Project", #Tab For About This Project
                               HTML("<div class = text-center><h1 class=text-primary>Twitter Sentiment Analysis</h1></div>"),

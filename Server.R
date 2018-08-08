@@ -19,6 +19,7 @@ CheckPackages<-function(){
   InstallPKGS("e1071")
   InstallPKGS("RTextTools")
   InstallPKGS("syuzhet")
+  InstallPKGS("rtweet")
 }
 
 InstallPKGS<-function(pkg){
@@ -47,19 +48,19 @@ TwitterAuthentication<-function(){
   access_secret <- "Y7zJa05Nyg0SUh7aDJdEaf4aeGcX6VmW6IlOxs2Dld502"
   
   #Download SSL Certificates
-  download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
+  #download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
   
   setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
   
   #Calling API Authentication Endpoint
-  cred <- OAuthFactory$new(consumerKey=consumer_key, 
-                           consumerSecret=consumer_secret,
-                           requestURL='https://api.twitter.com/oauth/request_token',
-                           accessURL='https://api.twitter.com/oauth/access_token',
-                           authURL='https://api.twitter.com/oauth/authorize')
+  #cred <- OAuthFactory$new(consumerKey=consumer_key, 
+  #                         consumerSecret=consumer_secret,
+  #                         requestURL='https://api.twitter.com/oauth/request_token',
+  #                         accessURL='https://api.twitter.com/oauth/access_token',
+  #                         authURL='https://api.twitter.com/oauth/authorize')
   
   #Authentication Process (Pin no will Require)
-  cred$handshake(cainfo="cacert.pem")
+  #cred$handshake(cainfo="cacert.pem")
 }
 
 CheckPackages()
@@ -97,13 +98,10 @@ server <- function(input, output, session) {
   }
   
   #extracting tweets
-  twtList<-reactive({twtList<-searchTwitter(input$searchTerm, n=input$maxTweets, lang="en") })
+  twtList<-reactive({twtList<-searchTwitter(input$searchTerm, n=input$maxTweets, geocode = input$Country, since = as.character(input$date), lang="en", resultType = NULL) })
+  
   #call dataframe
   tweets<-reactive({tweets<-TweetFrame(twtList() )})
-  
-  #creating wordcloud
-  text_word<-reactive({text_word<-wordclouds( tweets() )})
-  output$word <- renderPlot({ wordcloud(text_word(),random.order=F,max.words=80, col=rainbow(100), scale=c(4.5, 1)) })
   
   #sentiment analysis
   sentimentScore<-reactive({sentimentScore<-get_nrc_sentiment(tweets())})
@@ -117,7 +115,12 @@ server <- function(input, output, session) {
     return(ss)
   }
   
+  #creating wordcloud
+  text_word<-reactive({text_word<-wordclouds( tweets() )})
+  output$word <- renderPlot({wordcloud(text_word(),random.order=F,max.words=80, col=rainbow(100), scale=c(3.5, 1)) })
+  
+  #ggplot analysis results output
   output$histPos<-reactive({output$histPos<-renderPlot(
-    ggplot(sentimentDataFrame(tweets), aes(x = Sentiment, y = score)) + geom_bar(stat = "identity")
+    ggplot(sentimentDataFrame(tweets), aes(x = Sentiment, y = score)) + geom_bar(stat = "identity", fill=rainbow(nrow(sentimentDataFrame(tweets))))
   )})
 }
